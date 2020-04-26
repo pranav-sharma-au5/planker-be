@@ -8,7 +8,7 @@ var indexRouter = require('./routes/index');
 
 var app = express();
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: "https://planker.netlify.app",
   credentials: true
 }))
 app.use(logger('dev'));
