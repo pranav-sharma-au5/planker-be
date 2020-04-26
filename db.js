@@ -1,10 +1,6 @@
 const Sequelize = require("sequelize")
 
-const postgres = new Sequelize('planker', 'postgres', 'kuchbhi1', {
-  host: 'localhost',
-  dialect: 'postgres',
-  logging: false
-});
+const postgres = new Sequelize("postgres://eyevtkpd:Y329qMTaMGsbu8W1olggRkZIdxF_U9mY@drona.db.elephantsql.com:5432/eyevtkpd", { logging: false });
 
 try {
   postgres.authenticate();
