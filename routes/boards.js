@@ -28,24 +28,40 @@ router.get("/", async (req, res) => {
 })
 
 router.post('/', async (req, res) => {
-  // try {
-  const { title, backgroundUrl, userId } = req.body
-  let board = await Board.create({ title, backgroundUrl, userId })
-  board = board.toJSON()
-  boardId = board.id
-  await BoardMember.create({ boardId, userId })
-  const boards = await Board.findAll({ where: { userId } })
-  res.status(200).send(boards)
-  boardId = board.id
-  boardLabels.forEach(color => Label.create({ boardId, color }))
-  await List.create({ boardId, title: "Backlog", index: 0 })
-  await List.create({ boardId, title: "To-do", index: 1 })
-  await List.create({ boardId, title: "Done", index: 2 })
-  // }
-  // catch{
-  //   res.status(409).send({ status: 409, valid: false, message: "bad request" })
-  // }
+  try {
+    const { title, backgroundUrl, userId } = req.body
+    let board = await Board.create({ title, backgroundUrl, userId })
+    board = board.toJSON()
+    boardId = board.id
+    await BoardMember.create({ boardId, userId })
+    const boards = await Board.findAll({
+      include: [
+        {
+          model: User,
+          as: "boardMembers",
+          attributes: ['name', 'id'],
+          where: { id: userId }
+        },
+        {
+          model: Label,
+          as: "labels",
+          attributes: ['color', 'id']
+        }
+      ]
+    })
+    res.status(200).send(boards)
+    boardId = board.id
+    boardLabels.forEach(color => Label.create({ boardId, color }))
+    await List.create({ boardId, title: "Backlog", index: 0 })
+    await List.create({ boardId, title: "To-do", index: 1 })
+    await List.create({ boardId, title: "Done", index: 2 })
+  }
+  catch{
+    res.status(409).send({ status: 409, valid: false, message: "bad request" })
+  }
 });
+
+
 
 router.post("/:boardId", async (req, res) => {
   const { boardId } = req.params
